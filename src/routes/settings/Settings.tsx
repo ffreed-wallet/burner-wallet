@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useTheme } from '@/providers/theme';
 import { useChain } from '@/providers/ChainProvider';
 import { useLibBurner } from '@/providers/LibBurnerProvider';
+import { useWalletConnect } from '@/providers/WalletConnectProvider';
 import { setTestnetToggle, removeCustomChain } from '@/lib/storage';
 import AddCustomChainModal from '@/components/AddCustomChainModal/AddCustomChainModal';
 import { toast } from 'sonner';
@@ -161,16 +162,62 @@ function CustomChains() {
 
 function LogoutSection() {
 	const { isConnected, walletAddress, disconnect } = useLibBurner();
+	const { disconnect: wcDisconnect } = useWalletConnect();
 
-	const handleLogout = () => {
-		// Clear all localStorage items related to wallet
-		localStorage.removeItem('libburner_address');
-		localStorage.removeItem('libburner_connected');
-		
-		// Disconnect the wallet
+	const handleLogout = async () => {
+		try {
+			// Disconnect WalletConnect session(s) if any
+			await wcDisconnect().catch(() => {});
+		} catch {}
+
+	try {
+		// Disconnect LibBurner
 		disconnect();
-		
-		toast.success('Logged out successfully');
+	} catch {}
+
+	try {
+		// Clear storage
+		localStorage.clear();
+		sessionStorage.clear();
+	} catch {}
+
+	try {
+		// Clear Cache Storage
+		if ('caches' in window) {
+			const keys = await caches.keys();
+			await Promise.all(keys.map(k => caches.delete(k)));
+		}
+	} catch {}
+
+	try {
+		// Unregister service workers
+		if ('serviceWorker' in navigator) {
+			const regs = await navigator.serviceWorker.getRegistrations();
+			await Promise.all(regs.map(r => r.unregister()));
+		}
+	} catch {}
+
+	try {
+		// Attempt to clear IndexedDB databases (best-effort)
+		const anyIndexedDB: any = indexedDB as any;
+		if (anyIndexedDB && typeof anyIndexedDB.databases === 'function') {
+			const dbs = await anyIndexedDB.databases();
+			await Promise.all(
+				(dbs || []).map((db: any) => {
+					if (!db || !db.name) return Promise.resolve();
+					return new Promise<void>(resolve => {
+						const req = indexedDB.deleteDatabase(db.name as string);
+						req.onsuccess = req.onerror = req.onblocked = () => resolve();
+					});
+				})
+			);
+		}
+	} catch {}
+
+	toast.success('Logged out successfully');
+	// Navigation will auto-redirect due to cleared storage in WalletLayout
+	window.location.reload();
+
 	};
 
 	if (!isConnected || !walletAddress) {

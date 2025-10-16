@@ -6,13 +6,23 @@ export default function Component() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [path, setPath] = useState('');
+	const [isPWA, setIsPWA] = useState(false);
 
 	useEffect(() => {
 		setPath(location.pathname);
 	}, [location]);
 
+	useEffect(() => {
+		const inStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+		// iOS Safari adds navigator.standalone when launched from home screen
+		const inIOSStandalone = (window.navigator as any).standalone === true;
+		setIsPWA(Boolean(inStandalone || inIOSStandalone));
+	}, []);
+
 	return (
-		<nav className="font-large bg-background fixed bottom-0 left-0 right-0 mx-auto grid h-12 w-full max-w-full grid-cols-4 items-center justify-between overflow-hidden">
+		<nav
+			className={`font-large bg-background fixed bottom-0 left-0 right-0 mx-auto grid   ${isPWA ? 'h-24 pb-6' : 'h-12'} w-full max-w-full grid-cols-4 items-center justify-between overflow-hidden`}
+		>
 			<Button
 				aria-label="Home"
 				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0"
