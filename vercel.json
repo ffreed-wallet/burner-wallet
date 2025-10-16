@@ -1,9 +1,0 @@
-{
-	"rewrites": [
-		{
-			"source": "/__/auth/*",
-			"destination": "https://ffreed-wallet.firebaseapp.com/__/auth/*"
-		
-		}
-	]
-}
