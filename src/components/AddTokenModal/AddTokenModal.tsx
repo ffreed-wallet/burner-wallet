@@ -119,19 +119,16 @@ export default function AddTokenModal({ onTokenAdded }: AddTokenModalProps) {
               address: tokenAddress as `0x${string}`,
               abi: tokenInfoAbi,
               functionName: 'decimals',
-              authorizationList: []
             }),
             publicClient.readContract({
               address: tokenAddress as `0x${string}`,
               abi: tokenInfoAbi,
               functionName: 'symbol',
-              authorizationList: []
             }),
             publicClient.readContract({
               address: tokenAddress as `0x${string}`,
               abi: tokenInfoAbi,
               functionName: 'name',
-              authorizationList: []
             })
           ]);
 

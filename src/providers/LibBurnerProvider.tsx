@@ -317,19 +317,16 @@ export const LibBurnerProvider: React.FC<LibBurnerProviderProps> = ({ children }
               address: tokenAddress as `0x${string}`,
               abi: metadataAbi,
               functionName: 'decimals',
-              authorizationList: []
             }),
             publicClient.readContract({
               address: tokenAddress as `0x${string}`,
               abi: metadataAbi,
               functionName: 'symbol',
-              authorizationList: []
             }),
             publicClient.readContract({
               address: tokenAddress as `0x${string}`,
               abi: metadataAbi,
               functionName: 'name',
-              authorizationList: []
             })
           ]);
 
@@ -412,25 +409,21 @@ export const LibBurnerProvider: React.FC<LibBurnerProviderProps> = ({ children }
               abi: balanceOfAbi,
               functionName: 'balanceOf',
               args: [walletAddress as `0x${string}`],
-              authorizationList: []
             }),
             publicClient.readContract({
               address: tokenAddress as `0x${string}`,
               abi: balanceOfAbi,
               functionName: 'decimals',
-              authorizationList: []
             }),
             publicClient.readContract({
               address: tokenAddress as `0x${string}`,
               abi: balanceOfAbi,
               functionName: 'symbol',
-              authorizationList: []
             }),
             publicClient.readContract({
               address: tokenAddress as `0x${string}`,
               abi: balanceOfAbi,
               functionName: 'name',
-              authorizationList: []
             })
           ]);
 
