@@ -1,11 +1,12 @@
 // Simplified chain configuration for UI-only display
+
 export const chains = [
 	{
 		chainId: '0x1',
 		displayName: 'Ethereum',
 		logo: '/chain/mainnet/logo.png',
 		viemChain: { id: 1, name: 'Ethereum' },
-		rpcUrl: 'https://eth-mainnet.g.alchemy.com/v2',
+		rpcUrl: `https://eth-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://etherscan.io',
 		nativeToken: { symbol: 'ETH', decimals: 18, name: 'Ethereum' },
 		isTestnet: false
@@ -15,7 +16,7 @@ export const chains = [
 		displayName: 'Base',
 		logo: '/chain/base/logo.png',
 		viemChain: { id: 8453, name: 'Base' },
-		rpcUrl: 'https://base-mainnet.g.alchemy.com/v2',
+		rpcUrl: `https://base-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://basescan.org',
 		nativeToken: { symbol: 'ETH', decimals: 18, name: 'Ethereum' },
 		isTestnet: false
@@ -25,7 +26,7 @@ export const chains = [
 		displayName: 'Polygon',
 		logo: '/chain/polygon/logo.png',
 		viemChain: { id: 137, name: 'Polygon' },
-		rpcUrl: 'https://polygon-mainnet.g.alchemy.com/v2',
+		rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://polygonscan.com',
 		nativeToken: { symbol: 'MATIC', decimals: 18, name: 'Polygon' },
 		isTestnet: false
@@ -35,7 +36,7 @@ export const chains = [
 		displayName: 'Binance Smart Chain',
 		logo: '/chain/bsc/logo.png',
 		viemChain: { id: 56, name: 'BSC' },
-		rpcUrl: 'https://bsc-mainnet.g.alchemy.com/v2',
+		rpcUrl: `https://bsc-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://bscscan.com',
 		nativeToken: { symbol: 'BNB', decimals: 18, name: 'Binance Coin' },
 		isTestnet: false
@@ -45,7 +46,7 @@ export const chains = [
 		displayName: 'Optimism',
 		logo: '/chain/optimism/logo.png',
 		viemChain: { id: 10, name: 'Optimism' },
-		rpcUrl: 'https://opt-mainnet.g.alchemy.com/v2',
+		rpcUrl: `https://opt-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://optimistic.etherscan.io',
 		nativeToken: { symbol: 'ETH', decimals: 18, name: 'Ethereum' },
 		isTestnet: false
@@ -69,7 +70,7 @@ export const testnetChains = [
 		displayName: 'Ethereum Goerli',
 		logo: '/chain/mainnet/logo.png',
 		viemChain: { id: 5, name: 'Goerli' },
-		rpcUrl: 'https://eth-goerli.g.alchemy.com/v2',
+		rpcUrl: `https://eth-goerli.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://goerli.etherscan.io',
 		nativeToken: { symbol: 'ETH', decimals: 18, name: 'Ethereum' },
 		isTestnet: true
@@ -79,7 +80,7 @@ export const testnetChains = [
 		displayName: 'Base Sepolia',
 		logo: '/chain/base/logo.png',
 		viemChain: { id: 84532, name: 'Base Sepolia' },
-		rpcUrl: 'https://base-sepolia.g.alchemy.com/v2',
+		rpcUrl: `https://base-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://sepolia.basescan.org',
 		nativeToken: { symbol: 'ETH', decimals: 18, name: 'Ethereum' },
 		isTestnet: true
@@ -89,7 +90,7 @@ export const testnetChains = [
 		displayName: 'Polygon Mumbai',
 		logo: '/chain/polygon/logo.png',
 		viemChain: { id: 80001, name: 'Mumbai' },
-		rpcUrl: 'https://polygon-mumbai.g.alchemy.com/v2',
+		rpcUrl: `https://polygon-mumbai.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://mumbai.polygonscan.com',
 		nativeToken: { symbol: 'MATIC', decimals: 18, name: 'Polygon' },
 		isTestnet: true
@@ -99,7 +100,7 @@ export const testnetChains = [
 		displayName: 'BSC Testnet',
 		logo: '/chain/bsc/logo.png',
 		viemChain: { id: 97, name: 'BSC Testnet' },
-		rpcUrl: 'https://bsc-testnet.g.alchemy.com/v2',
+		rpcUrl: `https://bsc-testnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://testnet.bscscan.com',
 		nativeToken: { symbol: 'BNB', decimals: 18, name: 'Binance Coin' },
 		isTestnet: true
@@ -109,9 +110,10 @@ export const testnetChains = [
 		displayName: 'Optimism Goerli',
 		logo: '/chain/optimism/logo.png',
 		viemChain: { id: 420, name: 'Optimism Goerli' },
-		rpcUrl: 'https://opt-goerli.g.alchemy.com/v2',
+		rpcUrl: `https://opt-goerli.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
 		blockExplorerUrl: 'https://goerli-optimism.etherscan.io',
 		nativeToken: { symbol: 'ETH', decimals: 18, name: 'Ethereum' },
 		isTestnet: true
 	}
 ];
+
