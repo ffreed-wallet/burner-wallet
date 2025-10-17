@@ -652,9 +652,9 @@ export default function Component() {
 									)}
 								</div>
 							</div>
-							<div className="grow" />
+							
 							<Button
-								className="w-full"
+								className="w-full mt-6"
 								onClick={handleSend}
 								disabled={isSending || !resolvedAddress || !selectedToken || !amount}
 							>

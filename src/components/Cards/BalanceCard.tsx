@@ -3,18 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import AddFundsButton from '@/components/AddFundsButton/AddFundsButton';
 import { Skeleton } from '@/components/ui/skeleton';
+import QRCodeGenerator from '@/components/QRCodeGenerator/QRCodeGenerator';
 import { useLibBurner } from '@/providers/LibBurnerProvider';
 import { useChain } from '@/providers/ChainProvider';
 
-function ImageComponent() {
+function ImageComponent({ walletAddress }: { walletAddress: `0x${string}` }) {
 	return (
 		<div className="rounded p-5">
-			<div className="h-500 w-500 rounded-md bg-muted flex items-center justify-center">
-				<span className="text-muted-foreground">QR Code Placeholder</span>
-			</div>
-			<div className="mt-5 flex justify-center gap-4">
-				<AddFundsButton className="w-full" variant="default" />
-			</div>
+			<QRCodeGenerator
+				data={walletAddress}
+				className="mb-4"
+			/>
 		</div>
 	);
 }
@@ -75,32 +74,29 @@ export default function BalanceCard({
 
 	return (
 		<Dialog>
-			<Card className="basis-2" {...props}>
-				<CardHeader
-					className="cursor-pointer pb-0"
-					onClick={() => {
-						const addressToCopy = isConnected && libBurnerAddress ? libBurnerAddress : walletAddress;
-						navigator.clipboard.writeText(addressToCopy);
-						setCopiedAddress(true);
-					}}
-				>
-					<CardTitle className="flex items-start">
-						{isConnected && libBurnerAddress ? (
-							<div className="flex flex-col">
-								<span className="text-sm text-muted-foreground">
-									{ensName ? ensName : 'LibBurner Wallet'} ({selectedChain.displayName})
-								</span>
-								<span className="font-mono text-xs break-all">
-									{libBurnerAddress.slice(0, 6)}...{libBurnerAddress.slice(-4)}
-								</span>
-							</div>
-						) : (
-							'Connect LibBurner'
-						)}
-					</CardTitle>
-				</CardHeader>
 
-				<DialogTrigger asChild>
+			<DialogTrigger asChild>
+				<Card className="basis-2" {...props}>
+
+					<CardHeader
+						className="cursor-pointer pb-0"
+					>
+						<CardTitle className="flex items-start">
+							{isConnected && libBurnerAddress ? (
+								<div className="flex flex-col">
+									<span className="text-sm text-muted-foreground">
+										{ensName ? ensName : 'LibBurner Wallet'} ({selectedChain.displayName})
+									</span>
+									<span className="font-mono text-xs break-all">
+										{libBurnerAddress.slice(0, 6)}...{libBurnerAddress.slice(-4)}
+									</span>
+								</div>
+							) : (
+								'Connect LibBurner'
+							)}
+						</CardTitle>
+					</CardHeader>
+
 					<CardContent className="flex cursor-alias items-center pt-4	">
 						{!isLoading && totalBalance != null ? (
 							<>
@@ -121,14 +117,11 @@ export default function BalanceCard({
 							</div>
 						)}
 					</CardContent>
-				</DialogTrigger>
-			</Card>
+				</Card>
+			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-[425px]">
-				{/* <DialogHeader>
-          <DialogTitle>Wallet QR Code</DialogTitle>
-        </DialogHeader> */}
-				<ImageComponent />
+			<DialogContent className="max-w-[90vw] w-[90vw]">
+				<ImageComponent walletAddress={isConnected && libBurnerAddress ? libBurnerAddress as `0x${string}` : walletAddress} />
 			</DialogContent>
 		</Dialog>
 	);

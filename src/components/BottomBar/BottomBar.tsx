@@ -25,7 +25,7 @@ export default function Component() {
 		>
 			<Button
 				aria-label="Home"
-				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0"
+				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0 focus:outline-none focus:ring-0 active:!bg-secondary-bg"
 				variant="secondary"
 				onClick={() => {
 					navigate('/home');
@@ -35,7 +35,7 @@ export default function Component() {
 			</Button>
 			<Button
 				aria-label="Send"
-				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0"
+				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0 focus:outline-none focus:ring-0 active:!bg-secondary-bg"
 				variant="secondary"
 				onClick={() => {
 					navigate('/send');
@@ -45,7 +45,7 @@ export default function Component() {
 			</Button>
 			<Button
 				aria-label="Transactions"
-				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0"
+				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0 focus:outline-none focus:ring-0 active:!bg-secondary-bg"
 				variant="secondary"
 				onClick={() => {
 					navigate('/transactions');
@@ -56,7 +56,7 @@ export default function Component() {
 			<Button
 				aria-label="Account"
 				variant="secondary"
-				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0"
+				className="bg-secondary-bg flex h-full flex-1 flex-col items-center justify-center rounded-none text-xs min-w-0 focus:outline-none focus:ring-0 active:!bg-secondary-bg"
 				onClick={() => {
 					navigate('/settings');
 				}}
