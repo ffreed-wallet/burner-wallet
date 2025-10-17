@@ -102,6 +102,27 @@ export default function Component() {
 		// Reload balances
 		await loadRealBalances();
 		
+		// Refresh custom token balances if wallet is connected
+		if (isConnected && libBurnerAddress && customTokens.length > 0) {
+			try {
+				const tokenAddresses = customTokens.map(token => token.address);
+				const tokenBalances = await getTokenBalances(tokenAddresses);
+				
+				// Update custom tokens with fresh balances
+				const updatedTokens = customTokens.map(token => {
+					const balanceData = tokenBalances.find(b => b.address.toLowerCase() === token.address.toLowerCase());
+					return {
+						...token,
+						balance: balanceData?.balance || BigInt(0)
+					};
+				});
+				
+				setCustomTokens(updatedTokens);
+			} catch (error) {
+				console.error('Failed to refresh custom token balances:', error);
+			}
+		}
+		
 		setIsRefreshing(false);
 	};
 
@@ -222,6 +243,27 @@ export default function Component() {
 				
 				setCustomTokens(formattedTokens);
 				
+				// Fetch balances for custom tokens using RPC if wallet is connected
+				if (isConnected && libBurnerAddress) {
+					try {
+						const tokenAddresses = formattedTokens.map(token => token.address);
+						const tokenBalances = await getTokenBalances(tokenAddresses);
+						
+						// Update custom tokens with actual balances
+						const updatedTokens = formattedTokens.map(token => {
+							const balanceData = tokenBalances.find(b => b.address.toLowerCase() === token.address.toLowerCase());
+							return {
+								...token,
+								balance: balanceData?.balance || BigInt(0)
+							};
+						});
+						
+						setCustomTokens(updatedTokens);
+					} catch (error) {
+						console.error('Failed to fetch custom token balances:', error);
+					}
+				}
+				
 				// Fetch prices and images for stored tokens
 				const pricePromises = formattedTokens.map(async (token) => {
 					if (token.coinGeckoId) {
@@ -257,10 +299,10 @@ export default function Component() {
 		};
 		
 		loadStoredTokens();
-	}, [selectedChain.chainId]);
+	}, [selectedChain.chainId, isConnected, libBurnerAddress, getTokenBalances]);
 
 	// Handle custom token addition
-	const handleTokenAdded = (token: any) => {
+	const handleTokenAdded = async (token: any) => {
 		// Save token to browser storage
 		saveToken({
 			address: token.address,
@@ -272,7 +314,20 @@ export default function Component() {
 			logoUrl: token.logoUrl
 		});
 		
-		setCustomTokens(prev => [...prev, token]);
+		// Fetch balance for the new token if wallet is connected
+		let tokenWithBalance = { ...token, balance: BigInt(0) };
+		if (isConnected && libBurnerAddress) {
+			try {
+				const tokenBalances = await getTokenBalances([token.address]);
+				if (tokenBalances.length > 0) {
+					tokenWithBalance.balance = tokenBalances[0].balance;
+				}
+			} catch (error) {
+				console.error('Failed to fetch balance for new token:', error);
+			}
+		}
+		
+		setCustomTokens(prev => [...prev, tokenWithBalance]);
 		
 		// Fetch price and image for the new token
 		if (token.coinGeckoId) {

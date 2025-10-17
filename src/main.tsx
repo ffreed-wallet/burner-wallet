@@ -3,6 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import '@/index.css';
 import WalletLayout from '@/layout/WalletLayout.tsx';
 import { ThemeProvider } from '@/providers/theme.tsx';
@@ -70,6 +71,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 				<LibBurnerProvider>
 					<WalletConnectProvider>
 						<RouterProvider router={router} />
+						<Analytics />
 					</WalletConnectProvider>
 				</LibBurnerProvider>
 			</ChainProvider>

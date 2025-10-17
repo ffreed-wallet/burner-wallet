@@ -37,16 +37,12 @@ interface LibBurnerContextType {
   connect: () => Promise<void>;
   disconnect: () => void;
   getData: () => Promise<any>;
-  getUSD2Balance: () => Promise<bigint>;
-  getUSDCBalance: () => Promise<bigint>;
   getGasTokenBalance: () => Promise<bigint>;
   getZapperBalances: () => Promise<any>;
   getTokenBalances: (tokenAddresses: string[]) => Promise<any[]>;
   getTokenMetadata: (tokenAddresses: string[]) => Promise<any[]>;
   getEnsName: (address: string) => Promise<string | null>;
   getEnsAddress: (name: string) => Promise<string | null>;
-  sendUSD2: (destinationAddress: string, amount: bigint, pin?: string) => Promise<string>;
-  sendUSDC: (destinationAddress: string, amount: bigint, pin?: string) => Promise<string>;
   sendGasToken: (destinationAddress: string, amount: bigint, pin?: string) => Promise<string>;
   sendERC20Token: (tokenAddress: string, destinationAddress: string, amount: bigint, pin?: string) => Promise<string>;
   // New Alchemy API methods
@@ -198,31 +194,6 @@ export const LibBurnerProvider: React.FC<LibBurnerProviderProps> = ({ children }
     }
   };
 
-  const getUSD2Balance = async () => {
-    if (!burner || !isConnected) {
-      throw new Error('LibBurner not connected');
-    }
-    
-    try {
-      return await burner.getUSD2Balance();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to get USD2 balance');
-      throw err;
-    }
-  };
-
-  const getUSDCBalance = async () => {
-    if (!burner || !isConnected) {
-      throw new Error('LibBurner not connected');
-    }
-    
-    try {
-      return await burner.getUSDCBalance();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to get USDC balance');
-      throw err;
-    }
-  };
 
   const getGasTokenBalance = async () => {
     if (!walletAddress || !isConnected) {
@@ -494,47 +465,6 @@ export const LibBurnerProvider: React.FC<LibBurnerProviderProps> = ({ children }
     }
   };
 
-  const sendUSD2 = async (destinationAddress: string, amount: bigint, pin?: string) => {
-    if (!burner || !isConnected) {
-      throw new Error('LibBurner not connected');
-    }
-    
-    try {
-      // Set password if provided
-      if (pin && typeof (burner as any).setPassword === 'function') {
-        (burner as any).setPassword(pin);
-      }
-      
-      return await burner.sendUSD2({
-        destinationAddress: destinationAddress as `0x${string}`,
-        amount: amount
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send USD2');
-      throw err;
-    }
-  };
-
-  const sendUSDC = async (destinationAddress: string, amount: bigint, pin?: string) => {
-    if (!burner || !isConnected) {
-      throw new Error('LibBurner not connected');
-    }
-    
-    try {
-      // Set password if provided
-      if (pin && typeof (burner as any).setPassword === 'function') {
-        (burner as any).setPassword(pin);
-      }
-      
-      return await burner.sendUSDC({
-        destinationAddress: destinationAddress as `0x${string}`,
-        amount: amount
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send USDC');
-      throw err;
-    }
-  };
 
   const sendGasToken = async (destinationAddress: string, amount: bigint, pin?: string) => {
     if (!walletAddress || !isConnected) {
@@ -547,8 +477,26 @@ export const LibBurnerProvider: React.FC<LibBurnerProviderProps> = ({ children }
         (burner as any).setPassword(pin);
       }
       
+      // Ensure LibBurner is using the correct chain
+      console.log('Sending gas token on chain:', selectedChain.displayName, selectedChain.chainId);
+      
       // Get the appropriate chain for viem
       const chain = resolveViemChain(selectedChain.chainId);
+      
+      // Update the burner's clients to use the current chain
+      const inst: any = burner;
+      inst._getPublicClient = () => createPublicClient({
+        chain: chain,
+        transport: http(getRpcUrl())
+      });
+      inst._getWalletClient = () => createWalletClient({
+        chain: chain,
+        transport: http(getRpcUrl()),
+        account: inst.asViemAccount() as any,
+      });
+      
+      // Give a small delay to ensure chain switch is complete
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Get the wallet client from LibBurner
       const walletClient = burner._getWalletClient();
@@ -595,13 +543,27 @@ export const LibBurnerProvider: React.FC<LibBurnerProviderProps> = ({ children }
         (burner as any).setPassword(pin);
       }
       
+      // Ensure LibBurner is using the correct chain
+      console.log('Sending ERC-20 token on chain:', selectedChain.displayName, selectedChain.chainId);
+      
       // Get the appropriate chain for viem
       const chain = resolveViemChain(selectedChain.chainId);
-      const publicClient = createPublicClient({
-        chain,
+      
+      // Update the burner's clients to use the current chain
+      const inst: any = burner;
+      inst._getPublicClient = () => createPublicClient({
+        chain: chain,
         transport: http(getRpcUrl())
       });
-
+      inst._getWalletClient = () => createWalletClient({
+        chain: chain,
+        transport: http(getRpcUrl()),
+        account: inst.asViemAccount() as any,
+      });
+      
+      // Give a small delay to ensure chain switch is complete
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
       // Get the wallet client from LibBurner
       const walletClient = burner._getWalletClient();
       
@@ -684,16 +646,12 @@ export const LibBurnerProvider: React.FC<LibBurnerProviderProps> = ({ children }
     connect,
     disconnect,
     getData,
-    getUSD2Balance,
-    getUSDCBalance,
     getGasTokenBalance,
     getZapperBalances,
     getTokenBalances,
     getTokenMetadata,
     getEnsName,
     getEnsAddress,
-    sendUSD2,
-    sendUSDC,
     sendGasToken,
     sendERC20Token,
     getAlchemyTokenBalances,

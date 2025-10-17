@@ -65,7 +65,7 @@ export default function Component() {
 
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	const { getEnsAddress, sendUSD2, sendUSDC, sendGasToken, sendERC20Token, getZapperBalances, getAlchemyTokenBalances, walletAddress, getTokenBalances, getGasTokenBalance, getData } = useLibBurner();
+	const { getEnsAddress, sendGasToken, sendERC20Token, getZapperBalances, getAlchemyTokenBalances, walletAddress, getTokenBalances, getGasTokenBalance, getData } = useLibBurner();
 	const { selectedChain } = useChain();
 
 	// Simulate loading
@@ -349,18 +349,18 @@ export default function Component() {
 		setTxHash(null);
 
 		try {
+			// Ensure LibBurner is using the correct chain before sending
+			console.log('Ensuring LibBurner is on correct chain:', selectedChain.displayName, selectedChain.chainId);
+			
+			// Give a small delay to ensure chain switch is complete
+			await new Promise(resolve => setTimeout(resolve, 500));
+			
 			const amountBigInt = BigInt(Math.floor(parseFloat(txData.amount) * Math.pow(10, txData.selectedToken.contract_decimals)));
 			let hash: string;
 
 			if (txData.selectedToken.contract_address === '0x0000000000000000000000000000000000000000') {
 				// Gas token (ETH/MATIC/BNB)
 				hash = await sendGasToken(txData.resolvedAddress, amountBigInt, pin);
-			} else if (txData.selectedToken.contract_display_name === 'USD2') {
-				// USD2 token (LibBurner specific)
-				hash = await sendUSD2(txData.resolvedAddress, amountBigInt, pin);
-			} else if (txData.selectedToken.contract_display_name === 'USDC') {
-				// USDC token (LibBurner specific)
-				hash = await sendUSDC(txData.resolvedAddress, amountBigInt, pin);
 			} else if (txData.selectedToken.supports_erc?.includes('erc20')) {
 				// Generic ERC-20 token
 				hash = await sendERC20Token(txData.selectedToken.contract_address, txData.resolvedAddress, amountBigInt, pin);
@@ -401,10 +401,6 @@ export default function Component() {
 
 							if (txData.selectedToken.contract_address === '0x0000000000000000000000000000000000000000') {
 								hash = await sendGasToken(txData.resolvedAddress, amountBigInt, txData.pin);
-							} else if (txData.selectedToken.contract_display_name === 'USD2') {
-								hash = await sendUSD2(txData.resolvedAddress, amountBigInt, txData.pin);
-							} else if (txData.selectedToken.contract_display_name === 'USDC') {
-								hash = await sendUSDC(txData.resolvedAddress, amountBigInt, txData.pin);
 							} else if (txData.selectedToken.supports_erc?.includes('erc20')) {
 								hash = await sendERC20Token(txData.selectedToken.contract_address, txData.resolvedAddress, amountBigInt, txData.pin);
 							} else {
