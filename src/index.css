@@ -1,121 +1,125 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "./components/ui/theme.css";
 
-@layer base {
-	:root {
-		--background: 0 0% 100%;
-		--foreground: 240 10% 3.9%;
-		--card: 0 0% 100%;
-		--card-foreground: 240 10% 3.9%;
-		--popover: 0 0% 100%;
-		--popover-foreground: 240 10% 3.9%;
-		--primary: 142.1 76.2% 36.3%;
-		--primary-foreground: 355.7 100% 97.3%;
-		--secondary: 240 4.8% 95.9%;
-		--secondary-foreground: 240 5.9% 10%;
-		--muted: 240 4.8% 95.9%;
-		--muted-foreground: 240 3.8% 46.1%;
-		--accent: 240 4.8% 95.9%;
-		--accent-foreground: 240 5.9% 10%;
-		--destructive: 0 84.2% 60.2%;
-		--destructive-foreground: 0 0% 98%;
-		--border: 240 5.9% 90%;
-		--input: 240 5.9% 90%;
-		--ring: 240 5.9% 10%;
-		--radius: 0.5rem;
-	}
+@custom-variant dark (&:where(.dark, .dark *));
 
-	.dark {
-		--background: 240 10% 3.9%;
-		--foreground: 0 0% 98%;
-		--card: 240 10% 3.9%;
-		--card-foreground: 0 0% 98%;
-		--popover: 240 10% 3.9%;
-		--popover-foreground: 0 0% 98%;
-		--primary: 142.1 70.6% 45.3%;
-		--primary-foreground: 144.9 80.4% 10%;
-		--secondary: 240 3.7% 15.9%;
-		--secondary-foreground: 0 0% 98%;
-		--muted: 240 3.7% 15.9%;
-		--muted-foreground: 240 5% 64.9%;
-		--accent: 240 3.7% 15.9%;
-		--accent-foreground: 0 0% 98%;
-		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 0 0% 98%;
-		--border: 240 3.7% 15.9%;
-		--input: 240 3.7% 15.9%;
-		--ring: 240 4.9% 83.9%;
-	}
+/* Map app design tokens to Tailwind v4 so utilities like
+ * bg-card, text-muted-foreground, border-border, bg-primary/10
+ * resolve to the same vars the semantic .ui-* classes use. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-@layer base {
-	* {
-		@apply border-border;
-	}
-	html {
-		overflow: hidden;
-		height: 100%;
-		position: fixed;
-		width: 100%;
-	}
-	
-	body {
-		@apply bg-background text-foreground;
-		overflow: hidden;
-		height: 100%;
-		position: fixed;
-		width: 100%;
-		-webkit-overflow-scrolling: touch;
-	}
-	
-	#root {
-		overflow: hidden;
-		height: 100%;
-		width: 100%;
-	}
-	
-	/* iOS-specific styles to prevent scrolling */
-	@supports (-webkit-touch-callout: none) {
-		html, body {
-			position: fixed;
-			overflow: hidden;
-			height: 100%;
-			width: 100%;
-			-webkit-overflow-scrolling: touch;
-		}
-		
-		#root {
-			position: fixed;
-			overflow: hidden;
-			height: 100%;
-			width: 100%;
-		}
-	}
-	
-	/* Mobile-specific styles for iPhone 15 Pro */
-	@media (max-width: 430px) {
-		html {
-			overflow: hidden;
-			position: fixed;
-			height: 100%;
-			width: 100%;
-		}
-		
-		body {
-			overflow: hidden;
-			position: fixed;
-			height: 100%;
-			width: 100%;
-			max-width: 100vw;
-		}
-		
-		#root {
-			overflow: hidden;
-			position: fixed;
-			height: 100%;
-			width: 100%;
-			max-width: 100vw;
-		}
-	}
+/*
+ * Burner Wallet — mobile app shell.
+ * (Previously this file pulled in a brutalist monospace reset that forced
+ * JetBrains Mono, uppercase headings, 2px-bordered buttons and a
+ * `* + * { margin-top }` rhythm onto every element — that was the source
+ * of the "ugly" look. It is intentionally gone; typography now comes from
+ * the system stack + Inter, with SF Mono reserved for addresses/amounts.)
+ */
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Touch controls: prevent long-press callouts, allow fast taps. */
+button,
+a,
+[role="button"],
+.ui-tabbar-item,
+.ui-pill-btn,
+.ui-chain-chip,
+.ui-quick-chip {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* 16px inputs: prevents iOS Safari auto-zoom on focus. */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* Contain overscroll on sheets & inner scroll containers. */
+.ui-sheet-content,
+.ui-token-list,
+.ui-screen {
+  overscroll-behavior: contain;
+}
+
+/* Mobile app shell container. */
+#root {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@media (min-width: 520px) {
+  #root {
+    box-shadow: 0 0 60px -15px rgba(0, 0, 0, 0.15);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  .dark #root {
+    box-shadow: 0 0 80px -15px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Flat app background — no gradients. */
+#root::before {
+  content: none;
+}
+
+#root > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Keep images from blowing out layouts. */
+img {
+  max-width: 100%;
 }

@@ -1,33 +1,41 @@
-import path from 'path';
-import react from '@vitejs/plugin-react-swc';
-import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import { defineConfig } from 'vite'
 
+// https://vite.dev/config/
 export default defineConfig({
-	plugins: [
-		react(),
-		nodePolyfills({
-			include: ['buffer', 'process', 'util'],
-			globals: {
-				Buffer: true,
-				global: true,
-				process: true,
-			},
-		})
-	],
-	resolve: {
-		alias: {
-			'@': path.resolve(__dirname, './src')
-		}
-	},
-	server: {
-		host: true,
-		allowedHosts: [
-			'.trycloudflare.com',
-			'.loca.lt',
-			'9c408eb8a18d.ngrok-free.app',
-			'.ngrok.io',
-			'.ngrok-free.app'
-		]
-	}
-});
+  server: {
+    // Allow ngrok / other HTTPS tunnel hosts for phone testing.
+    allowedHosts: true,
+  },
+  plugins: [
+    react(),
+    tailwindcss(),
+    // libhalo/libburner predate bundler-free ESM and expect Node globals
+    // (Buffer/global/process). Same setup as the old ff freed-wallet app.
+    nodePolyfills({
+      include: ['buffer', 'process', 'util'],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+    }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: false, // we ship our own public/manifest.webmanifest
+      workbox: {
+        navigateFallbackDenylist: [/^\/manifest/, /^\/icons/],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.(png|svg|jpg|jpeg|webp|woff2?)$/i,
+            handler: 'CacheFirst',
+            options: { cacheName: 'assets', expiration: { maxEntries: 200 } },
+          },
+        ],
+      },
+    }),
+  ],
+})

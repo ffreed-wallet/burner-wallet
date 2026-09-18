@@ -1,27 +1,32 @@
-import * as React from 'react';
-import * as SwitchPrimitives from '@radix-ui/react-switch';
+import * as SwitchPrimitive from '@radix-ui/react-switch'
+import { forwardRef, type ComponentProps } from 'react'
+import { cn } from '../../lib/utils'
 
-import { cn } from '@/lib/utils';
+/** shadcn-style Switch. */
+export const Switch = forwardRef<HTMLButtonElement, ComponentProps<typeof SwitchPrimitive.Root>>(
+  ({ className, ...props }, ref) => {
+    return (
+      <SwitchPrimitive.Root ref={ref} className={cn('ui-switch', className)} {...props}>
+        <SwitchPrimitive.Thumb className="ui-switch-thumb" />
+      </SwitchPrimitive.Root>
+    )
+  },
+)
+Switch.displayName = 'Switch'
 
-const Switch = React.forwardRef<
-	React.ElementRef<typeof SwitchPrimitives.Root>,
-	React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => (
-	<SwitchPrimitives.Root
-		className={cn(
-			'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
-			className
-		)}
-		{...props}
-		ref={ref}
-	>
-		<SwitchPrimitives.Thumb
-			className={cn(
-				'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0'
-			)}
-		/>
-	</SwitchPrimitives.Root>
-));
-Switch.displayName = SwitchPrimitives.Root.displayName;
-
-export { Switch };
+/** Labelled switch row used for boolean settings. */
+export function SwitchRow({
+  label,
+  hint,
+  ...props
+}: ComponentProps<typeof SwitchPrimitive.Root> & { label: React.ReactNode; hint?: React.ReactNode }) {
+  return (
+    <label className="ui-switch-row">
+      <span className="ui-switch-label">
+        {label}
+        {hint && <span className="ui-hint" style={{ display: 'block', marginTop: 2 }}>{hint}</span>}
+      </span>
+      <Switch {...props} />
+    </label>
+  )
+}
