@@ -166,59 +166,79 @@ export async function fetchNfts(
   }))
 }
 
-/** Transfer history for an address on one chain. */
+/** Transfer history for an address on one chain (incoming + outgoing). */
 export async function fetchActivity(
   address: `0x${string}`,
   chainId: number,
 ): Promise<ActivityItem[]> {
   const rpc = alchemyBase(chainId)
   if (!rpc) return []
-  const res = await fetch(rpc, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'alchemy_getAssetTransfers',
-      params: [
-        {
-          fromBlock: '0x0',
-          toAddress: address,
-          category: ['external', 'erc20', 'erc721', 'erc1155'],
-          maxCount: '0x32',
-          order: 'desc',
-          withMetadata: true,
-        },
-      ],
-    }),
-  })
-  if (!res.ok) throw new Error(`activity HTTP ${res.status}`)
-  const json = (await res.json()) as {
-    result?: {
-      transfers?: {
-        hash: string
-        from: string
-        to: string
-        value?: number
-        asset?: string
-        category?: string
-        rawContract?: { address?: string }
-        metadata?: { blockTimestamp?: string }
-      }[]
+  const categories = ['external', 'internal', 'erc20', 'erc721', 'erc1155']
+  async function query(params: Record<string, unknown>) {
+    const res = await fetch(rpc as string, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'alchemy_getAssetTransfers',
+        params: [
+          {
+            fromBlock: '0x0',
+            category: categories,
+            maxCount: '0x32',
+            order: 'desc',
+            withMetadata: true,
+            ...params,
+          },
+        ],
+      }),
+    })
+    if (!res.ok) throw new Error(`activity HTTP ${res.status}`)
+    const json = (await res.json()) as {
+      result?: {
+        transfers?: {
+          hash: string
+          from: string
+          to: string
+          value?: number
+          asset?: string
+          category?: string
+          rawContract?: { address?: string }
+          metadata?: { blockTimestamp?: string }
+        }[]
+      }
     }
+    return json.result?.transfers ?? []
   }
-  return (json.result?.transfers ?? []).map((t) => ({
-    hash: t.hash as `0x${string}`,
-    chainId,
-    from: t.from,
-    to: t.to ?? address,
-    value: String(t.value ?? 0),
-    asset: t.asset ?? 'ETH',
-    category: t.category ?? 'external',
-    timestamp: t.metadata?.blockTimestamp,
-    status: 'confirmed' as const,
-    ...(t.rawContract?.address ? { contract: t.rawContract.address } : {}),
-  }))
+  // NOTE: previously only `toAddress` was queried, so sent transfers
+  // (including token-level sends inside relayed/7702 batches where the
+  // outer tx `from` is a relayer) never showed up.
+  const [incoming, outgoing] = await Promise.all([
+    query({ toAddress: address }),
+    query({ fromAddress: address }),
+  ])
+  const seen = new Set<string>()
+  const merged: ActivityItem[] = []
+  for (const t of [...outgoing, ...incoming]) {
+    const key =
+      `${t.hash ?? ''}-${(t.from ?? '').toLowerCase()}-${(t.to ?? '').toLowerCase()}-${t.value ?? 0}-${t.asset ?? ''}-${t.category ?? ''}`.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    merged.push({
+      hash: t.hash as `0x${string}`,
+      chainId,
+      from: t.from,
+      to: t.to ?? address,
+      value: String(t.value ?? 0),
+      asset: t.asset ?? 'ETH',
+      category: t.category ?? 'external',
+      timestamp: t.metadata?.blockTimestamp,
+      status: 'confirmed' as const,
+      ...(t.rawContract?.address ? { contract: t.rawContract.address } : {}),
+    })
+  }
+  return merged
 }
 
 /** Spot prices via Alchemy Prices API, CoinGecko demo as fallback. */
